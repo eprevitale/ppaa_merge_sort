@@ -1,53 +1,48 @@
-fn merge_sort(arr: &mut [i32]) {
-    let len: usize = arr.len();
-    if len <= 1 {
-        return;
-    }
+use rand::Rng;
 
-    let mid: usize = len / 2;
-    let mut left: Vec<i32> = arr[..mid].to_vec();
-    let mut right: Vec<i32> = arr[mid..].to_vec();
+mod bubble_sort;
+mod selection_sort;
+mod insertion_sort;
+mod merge_sort;
+mod quick_sort;
+mod heap_sort;
 
-    merge_sort(&mut left);
-    merge_sort(&mut right);
-
-    merge(arr, &left, &right);
-}
-
-fn merge(arr: &mut [i32], left: &[i32], right: &[i32]) {
-    let mut i: usize = 0;
-    let mut j: usize = 0;
-    let mut k: usize = 0;
-
-    while i < left.len() && j < right.len() {
-        if left[i] <= right[j] {
-            arr[k] = left[i];
-            i += 1;
-        } else {
-            arr[k] = right[j];
-            j += 1;
-        }
-        k += 1;
-    }
-
-    while i < left.len() {
-        arr[k] = left[i];
-        i += 1;
-        k += 1;
-    }
-
-    while j < right.len() {
-        arr[k] = right[j];
-        j += 1;
-        k += 1;
-    }
+fn generate_random_vector(size: usize) -> Vec<i32> {
+    let mut rng = rand::thread_rng();
+    (0..size).map(|_| rng.gen_range(1..100_000)).collect()
 }
 
 fn main() {
-    let mut arr: [i32; 7] = [38, 27, 43, 3, 9, 82, 10];
-    println!("Antes da ordenação: {:?}", arr);
+    let sizes = [1000, 10_000, 100_000];
 
-    merge_sort(&mut arr);
+    println!("{:20} | {:10} | {:10} | {:10} | {:10}", "Algoritmo", "Tamanho (n)", "Tempo (ms)", "Trocas", "Comparações");
+    println!("{}", "-".repeat(70));
 
-    println!("Depois da ordenação: {:?}", arr);
+    for &size in &sizes {
+        let original = generate_random_vector(size);
+
+        let mut data = original.clone();
+        let (comparisons, swaps, time) = bubble_sort::bubble_sort(&mut data);
+        println!("{:20} | {:10} | {:10.2} | {:10} | {:10}", "Bubble Sort", size, time, swaps, comparisons);
+
+        let mut data = original.clone();
+        let (comparisons, swaps, time) = selection_sort::selection_sort(&mut data);
+        println!("{:20} | {:10} | {:10.2} | {:10} | {:10}", "Selection Sort", size, time, swaps, comparisons);
+
+        let mut data = original.clone();
+        let (comparisons, swaps, time) = insertion_sort::insertion_sort(&mut data);
+        println!("{:20} | {:10} | {:10.2} | {:10} | {:10}", "Insertion Sort", size, time, swaps, comparisons);
+
+        let mut data = original.clone();
+        let (comparisons, swaps, time) = merge_sort::merge_sort(&mut data);
+        println!("{:20} | {:10} | {:10.2} | {:10} | {:10}", "Merge Sort", size, time, swaps, comparisons);
+
+        let mut data = original.clone();
+        let (comparisons, swaps, time) = quick_sort::quick_sort(&mut data);
+        println!("{:20} | {:10} | {:10.2} | {:10} | {:10}", "Quick Sort", size, time, swaps, comparisons);
+
+        let mut data = original.clone();
+        let (comparisons, swaps, time) = heap_sort::heap_sort(&mut data);
+        println!("{:20} | {:10} | {:10.2} | {:10} | {:10}", "Heap Sort", size, time, swaps, comparisons);
+    }
 }
